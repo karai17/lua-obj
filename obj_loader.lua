@@ -28,15 +28,23 @@ THE SOFTWARE.
 local path = ... .. "."
 local loader = {}
 
-loader.version = "0.0.1"
+loader.version = "0.0.2"
 
 function loader.load(file)
 	assert(file_exists(file), "File not found: " .. file)
 
+	local get_lines
+
+	if love then
+		get_lines = love.filesystem.lines
+	else
+		get_lines = io.lines
+	end
+
 	local lines = {}
 
-	for line in io.lines(file) do 
-		lines[#lines + 1] = line
+	for line in get_lines(file) do 
+		table.insert(lines, line)
 	end
 
 	return loader.parse(lines)
@@ -56,31 +64,31 @@ function loader.parse(object)
 		
 		if l[1] == "v" then
 			local v = {
-				x = l[2],
-				y = l[3],
-				z = l[4],
-				w = l[5] or 1.0
+				x = tonumber(l[2]),
+				y = tonumber(l[3]),
+				z = tonumber(l[4]),
+				w = tonumber(l[5]) or 1.0
 			}
 			table.insert(obj.v, v)
 		elseif l[1] == "vt" then
 			local vt = {
-				u = l[2],
-				v = l[3],
-				w = l[4] or 0
+				u = tonumber(l[2]),
+				v = tonumber(l[3]),
+				w = tonumber(l[4]) or 0
 			}
 			table.insert(obj.vt, vt)
 		elseif l[1] == "vn" then
 			local vn = {
-				x = l[2],
-				y = l[3],
-				z = l[4],
+				x = tonumber(l[2]),
+				y = tonumber(l[3]),
+				z = tonumber(l[4]),
 			}
 			table.insert(obj.vn, vn)
 		elseif l[1] == "vp" then
 			local vp = {
-				u = l[2],
-				v = l[3],
-				w = l[4],
+				u = tonumber(l[2]),
+				v = tonumber(l[3]),
+				w = tonumber(l[4]),
 			}
 			table.insert(obj.vp, vp)
 		elseif l[1] == "f" then
@@ -90,9 +98,9 @@ function loader.parse(object)
 				local split = string_split(l[i], "/")
 				local v = {}
 
-				v.v = split[1]
-				if split[2] ~= "" then v.vt = split[2] end
-				v.vn = split[3]
+				v.v = tonumber(split[1])
+				if split[2] ~= "" then v.vt = tonumber(split[2]) end
+				v.vn = tonumber(split[3])
 
 				table.insert(f, v)
 			end
@@ -105,6 +113,8 @@ function loader.parse(object)
 end
 
 function file_exists(file)
+	if love then return love.filesystem.exists(file) end
+
 	local f = io.open(file, "r")
 	if f then f:close() end
 	return f ~= nil
