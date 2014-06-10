@@ -60,7 +60,7 @@ function loader.parse(object)
 	}
 
 	for _, line in ipairs(object) do
-		local l = string_split(line, " ")
+		local l = string_split(line, "%s+")
 		
 		if l[1] == "v" then
 			local v = {
