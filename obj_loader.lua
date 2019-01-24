@@ -113,7 +113,7 @@ function loader.parse(object)
 end
 
 function file_exists(file)
-	if love then return love.filesystem.exists(file) end
+	if love then return love.filesystem.getInfo(file) ~= nil end
 
 	local f = io.open(file, "r")
 	if f then f:close() end
